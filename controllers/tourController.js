@@ -1,7 +1,7 @@
 // const mongoose = require("mongoose");
 const Tour = require("../model/tourModel");
 const HttpError = require("../error/Error");
-
+const mongoose = require("mongoose");
 //* GET ALL THE TOURS
 async function getTours(req, res, next) {
   try {
@@ -38,6 +38,11 @@ async function getToursById(req, res, next) {
 //* CREATE A NEW TOUR
 async function createTour(req, res, next) {
   const { name, rating, price } = req.body;
+  const existingTour = await Tour.findOne({ name });
+
+  if (existingTour) {
+    return next(new HttpError(400, "A tour with this name already exists."));
+  }
   const newTour = new Tour({ name, rating, price });
   try {
     await newTour.save();

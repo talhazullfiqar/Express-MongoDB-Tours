@@ -2,21 +2,17 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
+const userRoutes = require("./routes/userRoutes");
 const tourRoutes = require("./routes/tourRoutes");
 const HttpError = require("./error/Error");
 const errorController = require("./controllers/errorController");
-//variables
-const databaseConnection = process.env.MONGODB_URI.replace(
-  "<PASSWORD>",
-  process.env.DB_PASSWORD
-);
 
-//middleware
+//todo middleware
 app.use(express.json());
 app.use("/api/v1/tours", tourRoutes);
+app.use("/api/v1/users", userRoutes);
 
-// routes error Handling
+//* routes error Handling
 app.all("*", (req, res, next) => {
   const err = new HttpError(
     404,
@@ -25,15 +21,8 @@ app.all("*", (req, res, next) => {
   next(err);
 });
 
-// error Handling
+//! error Handling
 app.use(errorController.globalErrorHandler);
-//database connection
-mongoose
-  .connect(databaseConnection)
-  .then((con) =>
-    console.log(`✅ MongoDB Connected Successfully to: ${con.connection.name}`)
-  )
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 //exports
 module.exports = app;
